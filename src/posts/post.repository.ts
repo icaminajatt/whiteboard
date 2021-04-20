@@ -1,4 +1,6 @@
 import { EntityRepository, Repository } from "typeorm";
+import { Comments } from "./comment.entity";
+import { CreateCommentDto } from "./dto/create-comment.dto";
 import { CreatePostDto } from "./dto/create-post.dto";
 import { GetPostsFilterDto } from "./dto/get-posts-filter.dto";
 import { Posts } from "./post.entity";
@@ -33,5 +35,17 @@ export class PostRepository extends Repository<Posts> {
         await post.save();
 
         return post;
+    }
+
+    async createComment(id: number, createCommentDto: CreateCommentDto): Promise<Comments> {
+        const { comment } = createCommentDto;
+
+        const postComment = new Comments();
+        postComment.postId = id;
+        postComment.comment = comment;
+        postComment.timestamp = new Date();
+        await postComment.save()
+
+        return postComment;
     }
 }

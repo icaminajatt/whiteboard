@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Comments } from "./comment.entity";
 import { PostFlair } from "./post-flair.enum";
 
 @Entity()
@@ -17,4 +18,7 @@ export class Posts extends BaseEntity {
 
     @Column()
     timestamp: Date;
+
+    @OneToMany(() => Comments, comment => comment.post, { eager: true })
+    comments: Comments[];
 }

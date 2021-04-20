@@ -1,4 +1,6 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Comments } from './comment.entity';
+import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { GetPostsFilterDto } from './dto/get-posts-filter.dto';
 import { PostFlairValidationPipe } from './pipes/post-flair-validation.pipe';
@@ -50,4 +52,11 @@ export class PostsController {
             return this.postsService.updatePost(id, headline, description, flair);
     }
     
+    @Post('/:id/comments')
+    createComment(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() createCommentDto: CreateCommentDto,
+    ): Promise<Comments> {
+        return this.postsService.createComment(id, createCommentDto);
+    }
 }   

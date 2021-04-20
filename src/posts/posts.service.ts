@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Comments } from './comment.entity';
+import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { GetPostsFilterDto } from './dto/get-posts-filter.dto';
 import { PostFlair } from './post-flair.enum';
@@ -16,30 +18,6 @@ export class PostsService {
     async getPosts(filterDto: GetPostsFilterDto): Promise<Posts[]> {
         return this.postRepository.getPosts(filterDto);
     }
-    // private posts: PostEntry[] = [];
-
-    // getAllPosts(): PostEntry[] {
-    //     return this.posts;
-    // }
-
-    // getPostsWithFilters(filterDto: GetPostsFilterDto): PostEntry[] {
-    //     const { flair, search } = filterDto;
-
-    //     let posts = this.getAllPosts();
-
-    //     if (flair) {
-    //         posts = this.posts.filter(post => post.flair === flair);
-    //     }
-
-    //     if (search) {
-    //         posts = this.posts.filter(post =>
-    //             post.headline.includes(search) ||
-    //             post.description.includes(search),
-    //         );
-    //     }
-
-    //     return posts;
-    // }
 
     async getPostById(id: number): Promise<Posts> {
         const found = await this.postRepository.findOne(id)
@@ -96,5 +74,9 @@ export class PostsService {
         await post.save();
 
         return post;
+    }
+
+    async createComment(id: number, createCommentDto: CreateCommentDto): Promise<Comments> {
+        return await this.postRepository.createComment(id, createCommentDto);
     }
 }

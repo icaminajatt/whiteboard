@@ -1,9 +1,9 @@
-import { IsIn, IsNotEmpty, IsOptional } from "class-validator";
+import { IsEnum, IsNotEmpty, IsOptional } from "class-validator";
 import { PostFlair } from "../post-flair.enum";
 
 export class GetPostsFilterDto {
     @IsOptional()
-    @IsIn([PostFlair.BIRTHDAY, PostFlair.EVENT, PostFlair.GENERAL])
+    @IsEnum(PostFlair)
     flair: PostFlair;
 
     @IsOptional()
