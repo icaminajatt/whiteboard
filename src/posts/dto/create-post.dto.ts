@@ -1,5 +1,5 @@
-import { PostFlair } from "../posts.model";
 import { IsNotEmpty } from 'class-validator';
+import { PostFlair } from '../post-flair.enum';
 export class CreatePostDto {
     @IsNotEmpty()
     headline: string;

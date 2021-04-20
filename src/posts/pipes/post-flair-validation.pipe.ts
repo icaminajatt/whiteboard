@@ -1,5 +1,5 @@
 import { ArgumentMetadata, BadRequestException, PipeTransform } from "@nestjs/common";
-import { PostFlair } from "../posts.model";
+import { PostFlair } from "../post-flair.enum";
 
 export class PostFlairValidationPipe implements PipeTransform {
     readonly allowedFlairs = [

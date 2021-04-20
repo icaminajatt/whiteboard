@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { GetPostsFilterDto } from './dto/get-posts-filter.dto';
 import { PostFlairValidationPipe } from './pipes/post-flair-validation.pipe';
-import { PostEntry, PostFlair } from './posts.model';
+import { PostFlair } from './post-flair.enum';
+import { Posts } from './post.entity';
 import { PostsService } from './posts.service';
 
 @Controller('posts')
@@ -10,43 +11,24 @@ export class PostsController {
     constructor(private postsService: PostsService) {}
 
     @Get()
-    getPosts(@Query(ValidationPipe) filterDto: GetPostsFilterDto): PostEntry[] {
-        if (Object.keys(filterDto).length) {
-            return this.postsService.getPostsWithFilters(filterDto);
-        } else {
-            return this.postsService.getAllPosts();
-        }    
+    getPosts(@Query(ValidationPipe) filterDto: GetPostsFilterDto): Promise<Posts[]> {
+        return  this.postsService.getPosts(filterDto);
     }
     
     @Get('/:id')
-    getPostById(@Param('id') id: string): PostEntry {
+    getPostById(@Param('id', ParseIntPipe) id: number): Promise<Posts> {
         return this.postsService.getPostById(id);
     }
 
     @Post()
     @UsePipes(ValidationPipe)
-    createPost(@Body() createPostDto: CreatePostDto): PostEntry {
+    createPost(@Body() createPostDto: CreatePostDto): Promise<Posts> {
         return this.postsService.createPost(createPostDto);
     }
 
     @Delete('/:id')
-    deletePost(@Param('id') id: string): void {
-        this.postsService.deletePost(id);
-    }
-
-    @Patch('/:id/flair')
-    updatePostFlair(@Param('id') id: string, @Body('flair') flair: PostFlair) {
-        return this.postsService.updatePostFlair(id, flair);
-    }
-
-    @Patch('/:id/headline')
-    updateHeadline(@Param('id') id: string, @Body('headline') headline: string) {
-        return this.postsService.updateHeadline(id, headline);
-    }
-
-    @Patch('/:id/description')
-    updateDescription(@Param('id') id: string, @Body('description') description: string) {
-        return this.postsService.updateDescription(id, description);
+    deletePost(@Param('id', ParseIntPipe) id: number): Promise<void> {
+        return this.postsService.deletePost(id);
     }
 
     // @Patch('/:id/post')
@@ -60,10 +42,11 @@ export class PostsController {
     @Patch('/:id/post')
     @UsePipes(ValidationPipe)
     updatePost(
-        @Param('id') id: string, 
+        @Param('id', ParseIntPipe) id: number, 
         @Body('headline') headline: string,
         @Body('description') description: string,
-        @Body('flair', PostFlairValidationPipe) flair: PostFlair ) {
+        @Body('flair', PostFlairValidationPipe) flair: PostFlair 
+        ): Promise<Posts> {
             return this.postsService.updatePost(id, headline, description, flair);
     }
     

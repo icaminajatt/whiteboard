@@ -1,81 +1,66 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PostEntry, PostFlair } from './posts.model';
-import { v1 as uuid} from 'uuid';
+import { InjectRepository } from '@nestjs/typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { GetPostsFilterDto } from './dto/get-posts-filter.dto';
+import { PostFlair } from './post-flair.enum';
+import { Posts } from './post.entity';
+import { PostRepository } from './post.repository';
 
 @Injectable()
 export class PostsService {
-    private posts: PostEntry[] = [];
+    constructor(
+        @InjectRepository(PostRepository) 
+        private postRepository: PostRepository
+    ) {}
 
-    getAllPosts(): PostEntry[] {
-        return this.posts;
+    async getPosts(filterDto: GetPostsFilterDto): Promise<Posts[]> {
+        return this.postRepository.getPosts(filterDto);
     }
+    // private posts: PostEntry[] = [];
 
-    getPostsWithFilters(filterDto: GetPostsFilterDto): PostEntry[] {
-        const { flair, search } = filterDto;
+    // getAllPosts(): PostEntry[] {
+    //     return this.posts;
+    // }
 
-        let posts = this.getAllPosts();
+    // getPostsWithFilters(filterDto: GetPostsFilterDto): PostEntry[] {
+    //     const { flair, search } = filterDto;
 
-        if (flair) {
-            posts = this.posts.filter(post => post.flair === flair);
-        }
+    //     let posts = this.getAllPosts();
 
-        if (search) {
-            posts = this.posts.filter(post =>
-                post.headline.includes(search) ||
-                post.description.includes(search),
-            );
-        }
+    //     if (flair) {
+    //         posts = this.posts.filter(post => post.flair === flair);
+    //     }
 
-        return posts;
-    }
+    //     if (search) {
+    //         posts = this.posts.filter(post =>
+    //             post.headline.includes(search) ||
+    //             post.description.includes(search),
+    //         );
+    //     }
 
-    getPostById(id: string): PostEntry {
-       const found = this.posts.find(post => post.id === id);
+    //     return posts;
+    // }
 
-       if (!found) {
-        throw new NotFoundException(`Task with "${id}" not found`);
+    async getPostById(id: number): Promise<Posts> {
+        const found = await this.postRepository.findOne(id)
+
+        if (!found) {
+            throw new NotFoundException(`Task with "${id}" not found`);
        }
 
        return found;
     }
 
-    createPost(createPostDto: CreatePostDto): PostEntry {
-        const { headline, description, flair } = createPostDto;
-        const post: PostEntry = {
-            id: uuid(),
-            headline,
-            description,
-            flair,
-            timestamp: new Date(), 
-        };
+    async createPost(createPostDto: CreatePostDto): Promise<Posts> {
+        return this.postRepository.createPost(createPostDto);
+    }
+
+    async deletePost(id: number): Promise<void> {
+        const result = await this.postRepository.delete(id);
         
-        this.posts.push(post);
-        return post;
-    }
-
-    deletePost(id: string): void {
-        const found = this.getPostById(id);
-        this.posts = this.posts.filter(post => post.id !== found.id);
-    }
-
-    updatePostFlair(id: string, flair: PostFlair): PostEntry {
-        const post = this.getPostById(id)
-        post.flair = flair;
-        return post;
-    }
-
-    updateHeadline(id: string, headline: string): PostEntry {
-        const post = this.getPostById(id)
-        post.headline = headline;
-        return post;
-    }
-
-    updateDescription(id: string, description: string): PostEntry {
-        const post = this.getPostById(id)
-        post.description = description;
-        return post;
+        if (result.affected === 0) {
+            throw new NotFoundException(`Task with "${id}" not found`);
+        }
     }
 
     // updatePost(id: string, createPostDto: CreatePostDto): PostEntry {
@@ -96,8 +81,8 @@ export class PostsService {
     //     return post;
     // }
 
-    updatePost(id: string, headline: string, description: string, flair: PostFlair): PostEntry {
-        const post = this.getPostById(id);
+    async updatePost(id: number, headline: string, description: string, flair: PostFlair): Promise<Posts> {
+        const post = await this.getPostById(id);
         if (headline !== undefined) {
             post.headline = headline;
         };
@@ -108,6 +93,7 @@ export class PostsService {
             post.flair = flair;
         };
         post.timestamp = new Date();
+        await post.save();
 
         return post;
     }

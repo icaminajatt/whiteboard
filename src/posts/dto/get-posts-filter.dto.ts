@@ -1,5 +1,5 @@
 import { IsIn, IsNotEmpty, IsOptional } from "class-validator";
-import { PostFlair } from "../posts.model";
+import { PostFlair } from "../post-flair.enum";
 
 export class GetPostsFilterDto {
     @IsOptional()
