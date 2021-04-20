@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { GetPostsFilterDto } from './dto/get-posts-filter.dto';
+import { PostFlairValidationPipe } from './pipes/post-flair-validation.pipe';
 import { PostEntry, PostFlair } from './posts.model';
 import { PostsService } from './posts.service';
 
@@ -9,7 +10,7 @@ export class PostsController {
     constructor(private postsService: PostsService) {}
 
     @Get()
-    getPosts(@Query() filterDto: GetPostsFilterDto): PostEntry[] {
+    getPosts(@Query(ValidationPipe) filterDto: GetPostsFilterDto): PostEntry[] {
         if (Object.keys(filterDto).length) {
             return this.postsService.getPostsWithFilters(filterDto);
         } else {
@@ -23,6 +24,7 @@ export class PostsController {
     }
 
     @Post()
+    @UsePipes(ValidationPipe)
     createPost(@Body() createPostDto: CreatePostDto): PostEntry {
         return this.postsService.createPost(createPostDto);
     }
@@ -47,10 +49,22 @@ export class PostsController {
         return this.postsService.updateDescription(id, description);
     }
 
+    // @Patch('/:id/post')
+    // @UsePipes(ValidationPipe)
+    // updatePost(
+    //     @Param('id') id: string, 
+    //     @Body() createPostDto: CreatePostDto) {
+    //         return this.postsService.updatePost(id, createPostDto);
+    // }
+
     @Patch('/:id/post')
+    @UsePipes(ValidationPipe)
     updatePost(
         @Param('id') id: string, 
-        @Body() createPostDto: CreatePostDto) {
-            return this.postsService.updatePost(id, createPostDto);
+        @Body('headline') headline: string,
+        @Body('description') description: string,
+        @Body('flair', PostFlairValidationPipe) flair: PostFlair ) {
+            return this.postsService.updatePost(id, headline, description, flair);
     }
+    
 }   

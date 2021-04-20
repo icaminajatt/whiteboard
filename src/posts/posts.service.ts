@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PostEntry, PostFlair } from './posts.model';
 import { v1 as uuid} from 'uuid';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -32,7 +32,13 @@ export class PostsService {
     }
 
     getPostById(id: string): PostEntry {
-        return this.posts.find(post => post.id === id);
+       const found = this.posts.find(post => post.id === id);
+
+       if (!found) {
+        throw new NotFoundException(`Task with "${id}" not found`);
+       }
+
+       return found;
     }
 
     createPost(createPostDto: CreatePostDto): PostEntry {
@@ -50,7 +56,8 @@ export class PostsService {
     }
 
     deletePost(id: string): void {
-       this.posts = this.posts.filter(post => post.id !== id);
+        const found = this.getPostById(id);
+        this.posts = this.posts.filter(post => post.id !== found.id);
     }
 
     updatePostFlair(id: string, flair: PostFlair): PostEntry {
@@ -71,8 +78,25 @@ export class PostsService {
         return post;
     }
 
-    updatePost(id: string, createPostDto: CreatePostDto): PostEntry {
-        const { headline, description, flair } = createPostDto;
+    // updatePost(id: string, createPostDto: CreatePostDto): PostEntry {
+    //     const { headline, description, flair } = createPostDto;
+    //     const post = this.getPostById(id);
+    //     if (headline !== undefined) {
+    //         post.headline = headline;
+    //     };
+    //     if (description !== undefined) {
+    //         post.description = description;
+    //     };
+    //     if (flair !== undefined) {
+    //         post.flair = flair;
+    //     };
+    //     post.timestamp = new Date();
+
+    //     console.log(post);
+    //     return post;
+    // }
+
+    updatePost(id: string, headline: string, description: string, flair: PostFlair): PostEntry {
         const post = this.getPostById(id);
         if (headline !== undefined) {
             post.headline = headline;
@@ -85,7 +109,6 @@ export class PostsService {
         };
         post.timestamp = new Date();
 
-        console.log(post);
         return post;
     }
 }
