@@ -9,4 +9,7 @@ export class GetPostsFilterDto {
     @IsOptional()
     @IsNotEmpty()
     search: string;
+
+    @IsOptional()
+    year: Date;
 }

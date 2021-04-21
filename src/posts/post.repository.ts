@@ -9,7 +9,7 @@ import { Posts } from "./post.entity";
 export class PostRepository extends Repository<Posts> {
 
     async getPosts(filterDto: GetPostsFilterDto): Promise<Posts[]> {
-        const { flair, search } = filterDto;
+        const { flair, search, year } = filterDto;
         const query = this.createQueryBuilder('posts');
         
         if (flair) {
@@ -19,6 +19,10 @@ export class PostRepository extends Repository<Posts> {
         if (search) {
             query.andWhere('posts.headline LIKE :search OR posts.description LIKE :search', { search: `%${search}%` })
         }
+
+        if(year) {
+            query.andWhere(`EXTRACT(YEAR FROM posts.timestamp) = :`, { year })
+        }year
 
         const posts = await query.getMany();
         return posts;
