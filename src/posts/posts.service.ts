@@ -79,4 +79,8 @@ export class PostsService {
     async createComment(id: number, createCommentDto: CreateCommentDto): Promise<Comments> {
         return await this.postRepository.createComment(id, createCommentDto);
     }
+
+    async getComments(id: number) {
+        return await this.postRepository.getComments(id);
+    }
 }

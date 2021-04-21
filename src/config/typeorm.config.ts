@@ -1,4 +1,6 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
+import { Comments } from "src/posts/comment.entity";
+import { Posts } from "src/posts/post.entity";
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
     type: 'postgres',
@@ -7,6 +9,7 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     username: 'postgres',
     password: 'password',
     database: 'whiteboard',
-    autoLoadEntities: true,
+    // autoLoadEntities: true,
+    entities: [Comments, Posts],
     synchronize: true,
 }

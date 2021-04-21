@@ -59,4 +59,11 @@ export class PostsController {
     ): Promise<Comments> {
         return this.postsService.createComment(id, createCommentDto);
     }
+
+    @Get('/:id/comments')
+    getComments(
+        @Param('id', ParseIntPipe) id: number,
+    ) {
+        return this.postsService.getComments(id);
+    }
 }   
