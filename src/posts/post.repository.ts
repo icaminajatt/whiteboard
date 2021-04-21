@@ -48,13 +48,4 @@ export class PostRepository extends Repository<Posts> {
 
         return postComment;
     }
-
-    async getComments(id: number) {
-        const query = this.createQueryBuilder('comments');
-        const comments = await query
-            .leftJoinAndSelect('comments.post', 'posts.id')
-            .where('comments')
-            // .getMany();
-        console.log(comments);
-    }
 }

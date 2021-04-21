@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comments } from './comment.entity';
+import { CommentRepository } from './comment.repository';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { GetPostsFilterDto } from './dto/get-posts-filter.dto';
@@ -12,9 +13,13 @@ import { PostRepository } from './post.repository';
 export class PostsService {
     constructor(
         @InjectRepository(PostRepository) 
-        private postRepository: PostRepository
-    ) {}
+        private postRepository: PostRepository,
 
+        @InjectRepository(CommentRepository)
+        private commentRepository: CommentRepository,
+    ) {}
+    
+    // Post
     async getPosts(filterDto: GetPostsFilterDto): Promise<Posts[]> {
         return this.postRepository.getPosts(filterDto);
     }
@@ -23,7 +28,7 @@ export class PostsService {
         const found = await this.postRepository.findOne(id)
 
         if (!found) {
-            throw new NotFoundException(`Task with "${id}" not found`);
+            throw new NotFoundException(`Post with "${id}" not found`);
        }
 
        return found;
@@ -37,7 +42,7 @@ export class PostsService {
         const result = await this.postRepository.delete(id);
         
         if (result.affected === 0) {
-            throw new NotFoundException(`Task with "${id}" not found`);
+            throw new NotFoundException(`Post with "${id}" not found`);
         }
     }
 
@@ -76,11 +81,48 @@ export class PostsService {
         return post;
     }
 
+    // Comment
+
     async createComment(id: number, createCommentDto: CreateCommentDto): Promise<Comments> {
         return await this.postRepository.createComment(id, createCommentDto);
     }
 
     async getComments(id: number) {
-        return await this.postRepository.getComments(id);
+        return await this.commentRepository.getComments(id);
+    }
+
+    async getCommentById(id: number, commentId: number): Promise<Comments> {
+        return await this.commentRepository.getCommentById(id, commentId);
+    }
+
+    async deleteCommentById(commentId: number): Promise<void> {
+        const result = await this.commentRepository.delete(commentId);
+        
+        if (result.affected === 0) {
+            throw new NotFoundException(`Comment with "${commentId}" not found`);
+        }
+    }
+
+    async deleteComments(id: number): Promise<void> {
+        const result = await this.commentRepository.delete({ post: {id}})
+        
+        if (result.affected === 0) {
+            throw new NotFoundException(`No comments in this post.`);
+        }
+    }
+
+    async updateComment(id: number, commentId: number, createCommentDto: CreateCommentDto): Promise<Comments> {
+        const { comment } = createCommentDto;
+        const commentUpdate = await this.getCommentById(id, commentId);
+        commentUpdate.comment = comment;
+        commentUpdate.timestamp = new Date();
+        await commentUpdate.save();
+
+        return commentUpdate;
+    }
+
+    async getAllPostsAndComments() {
+        const all = await this.commentRepository.getAllPostsAndComments();
+        return all;
     }
 }

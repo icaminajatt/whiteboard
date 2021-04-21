@@ -9,7 +9,6 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     username: 'postgres',
     password: 'password',
     database: 'whiteboard',
-    // autoLoadEntities: true,
-    entities: [Comments, Posts],
+    autoLoadEntities: true,
     synchronize: true,
 }

@@ -12,6 +12,11 @@ import { PostsService } from './posts.service';
 export class PostsController {
     constructor(private postsService: PostsService) {}
 
+    // @Get()
+    // getAllPostsAndComments() {
+    //     return this.postsService.getAllPostsAndComments()
+    // }
+
     @Get()
     getPosts(@Query(ValidationPipe) filterDto: GetPostsFilterDto): Promise<Posts[]> {
         return  this.postsService.getPosts(filterDto);
@@ -65,5 +70,33 @@ export class PostsController {
         @Param('id', ParseIntPipe) id: number,
     ) {
         return this.postsService.getComments(id);
+    }
+
+    @Get('/:id/comments/:commentId')
+    getCommentById(
+        @Param('id', ParseIntPipe) id: number,
+        @Param('commentId', ParseIntPipe) commentId: number,
+    ) {
+        return this.postsService.getCommentById(id, commentId);
+    }
+
+    @Delete('/:id/comments/:commentId')
+    deleteCommentById(@Param('commentId', ParseIntPipe) commentId: number): Promise<void> {
+        return this.postsService.deleteCommentById(commentId);
+    }
+
+    @Delete('/:id/comments')
+    deleteComments(@Param('id', ParseIntPipe) id: number): Promise<void> {
+        return this.postsService.deleteComments(id);
+    }
+
+    @Patch('/:id/comments/:commentId')
+    @UsePipes(ValidationPipe)
+    updateComment(
+        @Param('id', ParseIntPipe) id: number, 
+        @Param('commentId', ParseIntPipe) commentId: number, 
+        @Body() createCommentDto: CreateCommentDto
+        ): Promise<Comments> {
+            return this.postsService.updateComment(id, commentId, createCommentDto);
     }
 }   
