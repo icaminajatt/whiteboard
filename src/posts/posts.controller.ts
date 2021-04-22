@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { Comments } from './comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -16,7 +17,6 @@ export class PostsController {
     // getAllPostsAndComments() {
     //     return this.postsService.getAllPostsAndComments()
     // }
-
     @Get()
     getPosts(@Query(ValidationPipe) filterDto: GetPostsFilterDto): Promise<Posts[]> {
         return  this.postsService.getPosts(filterDto);
@@ -27,12 +27,14 @@ export class PostsController {
         return this.postsService.getPostById(id);
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Post()
     @UsePipes(ValidationPipe)
     createPost(@Body() createPostDto: CreatePostDto): Promise<Posts> {
         return this.postsService.createPost(createPostDto);
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Delete('/:id')
     deletePost(@Param('id', ParseIntPipe) id: number): Promise<void> {
         return this.postsService.deletePost(id);
@@ -46,6 +48,7 @@ export class PostsController {
     //         return this.postsService.updatePost(id, createPostDto);
     // }
 
+    @UseGuards(AuthGuard('jwt'))
     @Patch('/:id/post')
     @UsePipes(ValidationPipe)
     updatePost(
@@ -57,6 +60,7 @@ export class PostsController {
             return this.postsService.updatePost(id, headline, description, flair);
     }
     
+    @UseGuards(AuthGuard('jwt'))
     @Post('/:id/comments')
     createComment(
         @Param('id', ParseIntPipe) id: number,
@@ -65,6 +69,7 @@ export class PostsController {
         return this.postsService.createComment(id, createCommentDto);
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Get('/:id/comments')
     getComments(
         @Param('id', ParseIntPipe) id: number,
@@ -72,6 +77,7 @@ export class PostsController {
         return this.postsService.getComments(id);
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Get('/:id/comments/:commentId')
     getCommentById(
         @Param('id', ParseIntPipe) id: number,
@@ -80,16 +86,19 @@ export class PostsController {
         return this.postsService.getCommentById(id, commentId);
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Delete('/:id/comments/:commentId')
     deleteCommentById(@Param('commentId', ParseIntPipe) commentId: number): Promise<void> {
         return this.postsService.deleteCommentById(commentId);
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Delete('/:id/comments')
     deleteComments(@Param('id', ParseIntPipe) id: number): Promise<void> {
         return this.postsService.deleteComments(id);
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Patch('/:id/comments/:commentId')
     @UsePipes(ValidationPipe)
     updateComment(

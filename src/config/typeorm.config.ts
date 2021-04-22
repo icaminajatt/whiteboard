@@ -1,14 +1,15 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
-import { Comments } from "src/posts/comment.entity";
-import { Posts } from "src/posts/post.entity";
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
     type: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    username: 'postgres',
-    password: 'password',
-    database: 'whiteboard',
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
     autoLoadEntities: true,
     synchronize: true,
 }

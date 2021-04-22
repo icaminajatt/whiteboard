@@ -21,7 +21,7 @@ export class PostRepository extends Repository<Posts> {
         }
 
         if(year) {
-            query.andWhere(`EXTRACT(YEAR FROM posts.timestamp) = :`, { year })
+            query.andWhere(`EXTRACT(YEAR FROM posts.timestamp) = :year`, { year })
         }year
 
         const posts = await query.getMany();

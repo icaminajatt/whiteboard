@@ -12,7 +12,7 @@ export class Comments extends BaseEntity {
     @Column()
     timestamp: Date;
 
-    @ManyToOne(() => Posts, post => post.comments, { eager: false })
+    @ManyToOne(() => Posts, post => post.comments, { eager: false, onDelete: 'CASCADE' })
     post: Posts;
 
     @Column()
