@@ -46,24 +46,6 @@ export class PostsService {
         }
     }
 
-    // updatePost(id: string, createPostDto: CreatePostDto): PostEntry {
-    //     const { headline, description, flair } = createPostDto;
-    //     const post = this.getPostById(id);
-    //     if (headline !== undefined) {
-    //         post.headline = headline;
-    //     };
-    //     if (description !== undefined) {
-    //         post.description = description;
-    //     };
-    //     if (flair !== undefined) {
-    //         post.flair = flair;
-    //     };
-    //     post.timestamp = new Date();
-
-    //     console.log(post);
-    //     return post;
-    // }
-
     async updatePost(id: number, headline: string, description: string, flair: PostFlair): Promise<Posts> {
         const post = await this.getPostById(id);
         if (headline !== undefined) {

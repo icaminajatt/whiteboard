@@ -13,10 +13,6 @@ import { PostsService } from './posts.service';
 export class PostsController {
     constructor(private postsService: PostsService) {}
 
-    // @Get()
-    // getAllPostsAndComments() {
-    //     return this.postsService.getAllPostsAndComments()
-    // }
     @Get()
     getPosts(@Query(ValidationPipe) filterDto: GetPostsFilterDto): Promise<Posts[]> {
         return  this.postsService.getPosts(filterDto);
@@ -40,14 +36,6 @@ export class PostsController {
         return this.postsService.deletePost(id);
     }
 
-    // @Patch('/:id/post')
-    // @UsePipes(ValidationPipe)
-    // updatePost(
-    //     @Param('id') id: string, 
-    //     @Body() createPostDto: CreatePostDto) {
-    //         return this.postsService.updatePost(id, createPostDto);
-    // }
-
     @UseGuards(AuthGuard('jwt'))
     @Patch('/:id/post')
     @UsePipes(ValidationPipe)
@@ -59,6 +47,8 @@ export class PostsController {
         ): Promise<Posts> {
             return this.postsService.updatePost(id, headline, description, flair);
     }
+
+    // Comments
     
     @UseGuards(AuthGuard('jwt'))
     @Post('/:id/comments')
